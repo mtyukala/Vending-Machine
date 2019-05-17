@@ -5,6 +5,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,5 +47,17 @@ public class ProductController {
 			p.setWeight(product.getWeight());
 			return productRepository.save(p);
 		}).orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
+	}
+
+	@DeleteMapping("/products/{id}")
+	public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+		if (!productRepository.existsById(id)) {
+			throw new ResourceNotFoundException("Product with " + id + " not found.");
+		}
+
+		Product product = productRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
+		productRepository.delete(product);
+		return ResponseEntity.ok().build();
 	}
 }
