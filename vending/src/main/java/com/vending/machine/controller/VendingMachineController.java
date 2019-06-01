@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vending.machine.model.Product;
-import com.vending.machine.repository.ProductRepository;
 import com.vending.machine.utils.ResourceNotFoundException;
+import com.vending.product.model.Coin;
+import com.vending.product.model.Product;
+import com.vending.product.repository.ProductRepository;
 
 /**
  * Class to define methods to perform operations on products
@@ -25,18 +26,29 @@ import com.vending.machine.utils.ResourceNotFoundException;
  *
  */
 @RestController
-public class ProductController {
+public class VendingMachineController {
 	@Autowired
 	private ProductRepository productRepository;
+	private CoinRepository coinRepository;
 
 	@GetMapping("/products")
 	public Page<Product> getProducts(Pageable pageable) {
 		return productRepository.findAll(pageable);
 	}
 
+	@GetMapping("/coins")
+	public Page<Coin> getCoins(Pageable pageable) {
+		return coinRepository.findAll(pageable);
+	}
+
 	@PostMapping("/products")
 	public Product createProducts(@Valid @RequestBody Product product) {
 		return productRepository.save(product);
+	}
+
+	@PostMapping("/coins")
+	public Coin createCoin(@Valid @RequestBody Coin coin) {
+		return coinRepository.save(coin);
 	}
 
 	@PutMapping("/products/{id}")
@@ -60,4 +72,15 @@ public class ProductController {
 		productRepository.delete(product);
 		return ResponseEntity.ok().build();
 	}
+
+	@PutMapping("/coins/{id}")
+	public Coin updateCoin(@PathVariable Long id, @Valid @RequestBody Coin coin) {
+		return coinRepository.findById(id).map(c -> {
+			c.setAmount(coin.getAmount());
+			c.setDescription(coin.getDescription());
+			return c;
+		}).orElseThrow(() -> new ResourceNotFoundException("Coin matching " + id + ", not found"));
+
+	}
+
 }

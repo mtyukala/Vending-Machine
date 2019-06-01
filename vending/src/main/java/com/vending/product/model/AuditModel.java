@@ -1,4 +1,4 @@
-package com.vending.machine.model;
+package com.vending.product.model;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.vending.machine.model;
+package com.vending.product.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,6 +30,11 @@ public class Product extends AuditModel {
 	private String name;
 	private float price;
 	private float weight;
+	private String pictureURLString;
+
+	public Product() {
+
+	}
 
 	public String getName() {
 		return name;
@@ -53,5 +58,13 @@ public class Product extends AuditModel {
 
 	public void setWeight(float weight) {
 		this.weight = weight;
+	}
+
+	public String getPictureURLString() {
+		return pictureURLString;
+	}
+
+	public void setPictureURLString(String pictureURLString) {
+		this.pictureURLString = pictureURLString;
 	}
 }
