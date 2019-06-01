@@ -38,6 +38,16 @@ public class Product extends AuditModel {
 
 	}
 
+	public Product(
+			@NotNull(message = "Please, enter a description of the product") @Size(min = 5, max = 50, message = "Description must be between {min} and {max} characters") String name,
+			@Min(message = "Price cannot be negative", value = 0) float price, float weight, String pictureURL) {
+		super();
+		this.name = name;
+		this.price = price;
+		this.weight = weight;
+		this.pictureURL = pictureURL;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -69,4 +79,5 @@ public class Product extends AuditModel {
 	public void setPictureURL(String pictureURLString) {
 		this.pictureURL = pictureURLString;
 	}
+
 }
