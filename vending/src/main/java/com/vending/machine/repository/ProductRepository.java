@@ -1,9 +1,9 @@
-package com.vending.product.repository;
+package com.vending.machine.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.vending.product.model.Product;
+import com.vending.machine.model.Product;
 
 /**
  * Defines an interface with methods to access products from the database

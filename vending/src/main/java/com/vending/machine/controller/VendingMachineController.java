@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vending.machine.model.Coin;
+import com.vending.machine.model.Product;
+import com.vending.machine.repository.CoinRepository;
+import com.vending.machine.repository.ProductRepository;
 import com.vending.machine.utils.ResourceNotFoundException;
-import com.vending.product.model.Coin;
-import com.vending.product.model.Product;
-import com.vending.product.repository.ProductRepository;
 
 /**
  * Class to define methods to perform operations on products
@@ -31,27 +32,27 @@ public class VendingMachineController {
 	private ProductRepository productRepository;
 	private CoinRepository coinRepository;
 
-	@GetMapping("/products")
+	@GetMapping("/api/products")
 	public Page<Product> getProducts(Pageable pageable) {
 		return productRepository.findAll(pageable);
 	}
 
-	@GetMapping("/coins")
+	@GetMapping("/api/coins")
 	public Page<Coin> getCoins(Pageable pageable) {
 		return coinRepository.findAll(pageable);
 	}
 
-	@PostMapping("/products")
+	@PostMapping("/api/products")
 	public Product createProducts(@Valid @RequestBody Product product) {
 		return productRepository.save(product);
 	}
 
-	@PostMapping("/coins")
+	@PostMapping("/api/coins")
 	public Coin createCoin(@Valid @RequestBody Coin coin) {
 		return coinRepository.save(coin);
 	}
 
-	@PutMapping("/products/{id}")
+	@PutMapping("/api/products/{id}")
 	public Product updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
 		return productRepository.findById(id).map(p -> {
 			p.setName(product.getName());
@@ -61,7 +62,7 @@ public class VendingMachineController {
 		}).orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
 	}
 
-	@DeleteMapping("/products/{id}")
+	@DeleteMapping("/api/products/{id}")
 	public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
 		if (!productRepository.existsById(id)) {
 			throw new ResourceNotFoundException("Product with " + id + " not found.");
@@ -73,7 +74,7 @@ public class VendingMachineController {
 		return ResponseEntity.ok().build();
 	}
 
-	@PutMapping("/coins/{id}")
+	@PutMapping("/api/coins/{id}")
 	public Coin updateCoin(@PathVariable Long id, @Valid @RequestBody Coin coin) {
 		return coinRepository.findById(id).map(c -> {
 			c.setAmount(coin.getAmount());

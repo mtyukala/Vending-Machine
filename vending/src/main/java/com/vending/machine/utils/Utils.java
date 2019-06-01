@@ -2,7 +2,7 @@ package com.vending.machine.utils;
 
 import java.util.List;
 
-import com.vending.product.model.Coin;
+import com.vending.machine.model.Coin;
 
 public class Utils {
 	public static boolean isAcceptable(List<Coin> coins, List<Coin> systemCoins) {

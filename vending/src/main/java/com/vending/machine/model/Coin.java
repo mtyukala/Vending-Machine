@@ -1,4 +1,4 @@
-package com.vending.product.model;
+package com.vending.machine.model;
 
 public class Coin {
 	// enum coinType{PAPER, COIN}

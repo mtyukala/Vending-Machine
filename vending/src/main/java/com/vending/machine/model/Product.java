@@ -1,11 +1,12 @@
-package com.vending.product.model;
+package com.vending.machine.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -25,12 +26,13 @@ public class Product extends AuditModel {
 	@GeneratedValue(generator = "product_genderator")
 	@SequenceGenerator(name = "product_generator", sequenceName = "product_sequence", initialValue = 100)
 	private Long id;
-	@NotBlank
-	@Size(min = 5, max = 50)
+	@NotNull(message = "Please, enter a description of the product")
+	@Size(min = 5, max = 50, message = "Description must be between {min} and {max} characters")
 	private String name;
+	@Min(message = "Price cannot be negative", value = 0)
 	private float price;
 	private float weight;
-	private String pictureURLString;
+	private String pictureURL;
 
 	public Product() {
 
@@ -60,11 +62,11 @@ public class Product extends AuditModel {
 		this.weight = weight;
 	}
 
-	public String getPictureURLString() {
-		return pictureURLString;
+	public String getPictureURL() {
+		return pictureURL;
 	}
 
-	public void setPictureURLString(String pictureURLString) {
-		this.pictureURLString = pictureURLString;
+	public void setPictureURL(String pictureURLString) {
+		this.pictureURL = pictureURLString;
 	}
 }
