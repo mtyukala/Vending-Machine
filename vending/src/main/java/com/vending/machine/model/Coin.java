@@ -37,6 +37,14 @@ public class Coin extends AuditModel {
 		this.description = description;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public double getAmount() {
 		return amount;
 	}
@@ -51,5 +59,32 @@ public class Coin extends AuditModel {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Coin coin = (Coin) obj;
+		return (coin.getAmount() == getAmount() && coin.getDescription().equals(getDescription()));
+
+		// return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 43;
+		int result = 1;
+
+		result = prime * result + (getId().hashCode());
+		result = prime * result + Long.valueOf(Double.doubleToLongBits(getAmount())).hashCode();
+		result = prime * result + getDescription().hashCode();
+
+		return result;
 	}
 }

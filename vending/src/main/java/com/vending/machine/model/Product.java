@@ -48,6 +48,14 @@ public class Product extends AuditModel {
 		this.pictureURL = pictureURL;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -66,6 +74,36 @@ public class Product extends AuditModel {
 
 	public void setPrice(float price) {
 		this.price = price;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Product p = (Product) obj;
+		return (p.getPrice() == getPrice() && p.getName().equals(getName()) && p.getPictureURL().equals(getPictureURL())
+				&& p.getWeight() == getWeight());
+
+		// return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 41;
+		int result = 1;
+
+		result = prime * result + (getId().hashCode());
+		result = prime * result + Long.valueOf(Double.doubleToLongBits(getPrice())).hashCode();
+		result = prime * result + getName().hashCode();
+		result = prime * result + Long.valueOf(Double.doubleToLongBits(getWeight())).hashCode();
+		result = prime * result + getPictureURL().hashCode();
+
+		return result;
 	}
 
 	public void setWeight(float weight) {

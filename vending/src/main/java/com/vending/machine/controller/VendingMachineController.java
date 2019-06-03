@@ -1,5 +1,8 @@
 package com.vending.machine.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +15,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vending.machine.model.Coin;
 import com.vending.machine.model.Product;
 import com.vending.machine.repository.CoinRepository;
 import com.vending.machine.repository.ProductRepository;
+import com.vending.machine.repository.PurchaseRepository;
 import com.vending.machine.utils.ResourceNotFoundException;
 
 /**
@@ -27,10 +32,13 @@ import com.vending.machine.utils.ResourceNotFoundException;
  *
  */
 @RestController
+@RequestMapping("/")
 public class VendingMachineController {
 	@Autowired
 	private ProductRepository productRepository;
 	private CoinRepository coinRepository;
+
+	private PurchaseRepository purchaseRepository;
 
 	@GetMapping("/api/products")
 	public Page<Product> getProducts(Pageable pageable) {
@@ -82,6 +90,11 @@ public class VendingMachineController {
 			return c;
 		}).orElseThrow(() -> new ResourceNotFoundException("Coin matching " + id + ", not found"));
 
+	}
+
+	@PostMapping("/api/buy")
+	public Map<Product, List<Coin>> buy(@Valid @RequestBody Product product) {
+		return null;
 	}
 
 }
