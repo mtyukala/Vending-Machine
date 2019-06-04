@@ -1,77 +1,89 @@
 package com.vending.machine.model;
 
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "purchase")
 public class Purchase {
-	@Embedded
-	@JsonIgnore
-	private PurchaseCoinPK pk;
+    @Id
+    private Long id;
+    @Column(nullable = false)
+    private Integer quantity;
 
-	@Column(nullable = false)
-	private Integer quantity;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name="product_id", nullable = false)
+    private Product product;
 
-	public Purchase() {
-		super();
-	}
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "coin_id", nullable = false)
+    private List<Coin> coins;
 
-	public Purchase(List<Coin> coins, Product product, Integer quantity) {
-		pk = new PurchaseCoinPK();
-		pk.setCoins(coins);
-		pk.setProduct(product);
-		this.quantity = quantity;
-	}
+    public Purchase() {
+        super();
+    }
 
-	public Product getProduct() {
-		// TODO Auto-generated method stub
-		return pk.getProduct();
-	}
+    public Purchase(List<Coin> coins, Product product, Integer quantity) {
+        // pk = new PurchaseCoinPK();
+        setCoins(coins);
+        setProduct(product);
+        this.quantity = quantity;
+    }
 
-	public Integer getQuantity() {
-		return quantity;
-	}
+    public Product getProduct() {
+        return product;
+    }
 
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
-	public PurchaseCoinPK getPk() {
-		return pk;
-	}
+    public List<Coin> getCoins() {
+        return coins;
+    }
 
-	public void setPk(PurchaseCoinPK pk) {
-		this.pk = pk;
-	}
+    public void setCoins(List<Coin> coins) {
+        this.coins = coins;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		Purchase other = (Purchase) obj;
-		if (pk == null) {
-			if (other.pk != null) {
-				return false;
-			}
-		} else if (!pk.equals(other.pk)) {
-			return false;
-		}
+    public Integer getQuantity() {
+        return quantity;
+    }
 
-		return true;
-	}
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Purchase other = (Purchase) obj;
+        if (coins == null) {
+            return false;
+        } else if (!product.equals(other.getProduct())) {
+            return false;
+        } else if (!coins.equals(other.getCoins())) {
+            return false;
+        } else if (quantity != other.getQuantity()) {
+            return false;
+        }
+        return true;
+    }
 
 }

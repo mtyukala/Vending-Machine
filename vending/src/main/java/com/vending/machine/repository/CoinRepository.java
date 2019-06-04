@@ -1,11 +1,12 @@
 package com.vending.machine.repository;
 
+import com.vending.machine.model.Coin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.vending.machine.model.Coin;
 
 @Repository
 public interface CoinRepository extends JpaRepository<Coin, Long> {
 
+    // @Query("SELECT DISTINCT amount FROM  coin")
+    //List<Coin> findDistinctByAmount();
 }

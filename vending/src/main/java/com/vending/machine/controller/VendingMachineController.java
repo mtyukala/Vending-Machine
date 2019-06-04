@@ -1,100 +1,180 @@
 package com.vending.machine.controller;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.vending.machine.model.Coin;
 import com.vending.machine.model.Product;
+import com.vending.machine.model.Purchase;
 import com.vending.machine.repository.CoinRepository;
 import com.vending.machine.repository.ProductRepository;
 import com.vending.machine.repository.PurchaseRepository;
 import com.vending.machine.utils.ResourceNotFoundException;
+import com.vending.machine.utils.Utils;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class to define methods to perform operations on products
- * 
- * @author Mkhululi Tyukala
  *
+ * @author Mkhululi Tyukala
  */
 @RestController
+@Transactional
 @RequestMapping("/")
 public class VendingMachineController {
-	@Autowired
-	private ProductRepository productRepository;
-	private CoinRepository coinRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CoinRepository coinRepository;
+    @Autowired
+    private PurchaseRepository purchaseRepository;
 
-	private PurchaseRepository purchaseRepository;
+    @ApiOperation(value = "List all products in the system")
+    @GetMapping("/api/products")
+    public Page<Product> getProducts(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
 
-	@GetMapping("/api/products")
-	public Page<Product> getProducts(Pageable pageable) {
-		return productRepository.findAll(pageable);
-	}
+    @ApiOperation(value = "List all acceptable coins in the system")
+    @GetMapping("/api/coins")
+    public Page<Coin> getCoins(Pageable pageable) {
+        return coinRepository.findAll(pageable);
+    }
 
-	@GetMapping("/api/coins")
-	public Page<Coin> getCoins(Pageable pageable) {
-		return coinRepository.findAll(pageable);
-	}
+    @ApiOperation(value = "Add a new product in the system")
+    @PostMapping("/api/products")
+    public Product createProducts(@Valid @RequestBody Product product) {
+        return productRepository.save(product);
+    }
 
-	@PostMapping("/api/products")
-	public Product createProducts(@Valid @RequestBody Product product) {
-		return productRepository.save(product);
-	}
+    @ApiOperation(value = "Add a new coin into the system")
+    @PostMapping("/api/coins")
+    public Coin createCoin(@Valid @RequestBody Coin coin) {
+        return coinRepository.save(coin);
+    }
 
-	@PostMapping("/api/coins")
-	public Coin createCoin(@Valid @RequestBody Coin coin) {
-		return coinRepository.save(coin);
-	}
+    @ApiOperation(value = "Update a product")
+    @PutMapping("/api/products/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
+        return productRepository.findById(id).map(p -> {
+            p.setName(product.getName());
+            p.setPrice(product.getPrice());
+            p.setWeight(product.getWeight());
+            return ResponseEntity.ok(p);
+        }).orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
+    }
 
-	@PutMapping("/api/products/{id}")
-	public Product updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
-		return productRepository.findById(id).map(p -> {
-			p.setName(product.getName());
-			p.setPrice(product.getPrice());
-			p.setWeight(product.getWeight());
-			return productRepository.save(p);
-		}).orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
-	}
+    @ApiOperation(value = "Delete a Product")
+    @DeleteMapping("/api/products/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product with " + id + " not found.");
+        }
 
-	@DeleteMapping("/api/products/{id}")
-	public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
-		if (!productRepository.existsById(id)) {
-			throw new ResourceNotFoundException("Product with " + id + " not found.");
-		}
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
+        productRepository.delete(product);
+        return ResponseEntity.ok().build();
+    }
 
-		Product product = productRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
-		productRepository.delete(product);
-		return ResponseEntity.ok().build();
-	}
+    @PutMapping("/api/coins/{id}")
+    public ResponseEntity<Coin> updateCoin(@PathVariable Long id, @Valid @RequestBody Coin coin) {
+        return coinRepository.findById(id).map(c -> {
+            c.setAmount(coin.getAmount());
+            c.setDescription(coin.getDescription());
+            return ResponseEntity.ok(c);
+        }).orElseThrow(() -> new ResourceNotFoundException("Coin matching " + id + ", not found"));
 
-	@PutMapping("/api/coins/{id}")
-	public Coin updateCoin(@PathVariable Long id, @Valid @RequestBody Coin coin) {
-		return coinRepository.findById(id).map(c -> {
-			c.setAmount(coin.getAmount());
-			c.setDescription(coin.getDescription());
-			return c;
-		}).orElseThrow(() -> new ResourceNotFoundException("Coin matching " + id + ", not found"));
+    }
 
-	}
+    @ApiOperation(value = "Create a new purchase into the system")
+    @PostMapping("/api/buy")
+    public Map<Product, List<Coin>> buy(@Valid @RequestBody Product product, @Valid @RequestBody List<Coin> coins) {
 
-	@PostMapping("/api/buy")
-	public Map<Product, List<Coin>> buy(@Valid @RequestBody Product product) {
-		return null;
-	}
+        Product productToBuy = productRepository.findById(product.getId()).orElseThrow(() -> new ResourceNotFoundException("Product with name" + product.getName() + " not found"));
 
+        if (!Utils.isAcceptable(coins, coins)) {
+            throw new ResourceNotFoundException("The inserted coins are not acceptable");
+        }
+
+        // --- update products
+        if (productToBuy.getItems() < 1) {
+            throw new ResourceNotFoundException("Products put of stock");
+        }
+
+        double amount = 0;
+        for (Coin coin : coins) {
+            amount += coin.getAmount();
+        }
+
+        if (amount < product.getPrice()) {
+            throw new ResourceNotFoundException("Insufficient coins");
+        }
+
+        // --- update products
+        product.setItems(product.getItems() - 1);
+        productRepository.save(product);
+
+        // --- save purchase
+        Purchase purchase = new Purchase(coins, product, 1);
+        purchaseRepository.save(purchase);
+
+        // --- update coins work out change
+        coinRepository.saveAll(coins);
+        List<Coin> change = Collections.emptyList();
+        if (amount > product.getPrice()) {
+            change = makeChange(product.getPrice() - amount);
+            for (Coin coin : change) {
+                coin.setCount(coin.getCount() - 1);
+                coinRepository.save(coin);
+            }
+        }
+
+        // --- return change TODO
+        Map<Product, List<Coin>> response = new HashMap<>();
+        response.put(product, change);
+        return response;
+    }
+
+    @GetMapping("/api/cancel")
+    public String cancel() {
+        return "redirect:/api/products";
+    }
+
+    /**
+     * Converts the given amount into a list of coins
+     *
+     * @param amount the amount of change in cents
+     * @return list of coins as a change for the purchase
+     */
+    public List<Coin> makeChange(double amount) {
+        if (amount <= 0) {
+            return Collections.emptyList();
+        }
+
+        List<Coin> list = Collections.emptyList();
+        List<Coin> coins = coinRepository.findAll(); // coins are unique in the system
+        Collections.sort(coins); // sort from Large to Small
+
+        for (Coin coin : coins) {
+            if (amount > coin.getAmount()) {
+                int money = (int) (amount / coin.getAmount());
+                for (int i = 0; i < money; i++) {
+                    list.add(coin);
+                }
+
+                amount -= money;
+            }
+        }
+        return list;
+    }
 }

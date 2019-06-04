@@ -32,6 +32,7 @@ public class Product extends AuditModel {
 	@Min(message = "Price cannot be negative", value = 0)
 	private float price;
 	private float weight;
+	private int items;
 	private String pictureURL;
 
 	public Product() {
@@ -40,11 +41,12 @@ public class Product extends AuditModel {
 
 	public Product(
 			@NotNull(message = "Please, enter a description of the product") @Size(min = 5, max = 50, message = "Description must be between {min} and {max} characters") String name,
-			@Min(message = "Price cannot be negative", value = 0) float price, float weight, String pictureURL) {
+			@Min(message = "Price cannot be negative", value = 0) float price, float weight, int items, String pictureURL) {
 		super();
 		this.name = name;
 		this.price = price;
 		this.weight = weight;
+		this.items=items;
 		this.pictureURL = pictureURL;
 	}
 
@@ -64,6 +66,14 @@ public class Product extends AuditModel {
 		return price;
 	}
 
+	public int getItems() {
+		return items;
+	}
+
+	public void setItems(int items) {
+		this.items = items;
+	}
+
 	public float getWeight() {
 		return weight;
 	}
@@ -74,6 +84,11 @@ public class Product extends AuditModel {
 
 	public void setPrice(float price) {
 		this.price = price;
+	}
+
+	@Override
+	public String toString() {
+		return this.name + "(" + this.weight + ") x(" +this.items+") @ " + this.price;
 	}
 
 	@Override

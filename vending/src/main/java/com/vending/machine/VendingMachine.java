@@ -1,25 +1,25 @@
 package com.vending.machine;
 
+import com.vending.machine.model.Coin;
+import com.vending.machine.model.Product;
+import com.vending.machine.utils.Utils;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.vending.machine.model.Coin;
-import com.vending.machine.model.Product;
-import com.vending.machine.utils.Utils;
-
 public class VendingMachine {
+	private static final Coin[] array = {new Coin(10, "TENC", 5), new Coin(50, "FIFTY", 100), new Coin(100, "R1", 200),
+			new Coin(500, "R5", 300)};
 	private final Map<Product, Integer> inventory;
 	private final Map<Coin, Integer> initialCoins;
 	private double balance;
-	private static final Coin[] array = { new Coin(10, "TENC"), new Coin(50, "FIFTY"), new Coin(100, "R1"),
-			new Coin(500, "R5") };
 	private List<Coin> acceptableCoins = Arrays.asList(array);
 
 	public VendingMachine(Map<Product, Integer> newStockList, Map<Coin, Integer> coins) {
-		this.inventory = newStockList;
-		this.initialCoins = coins;
+		inventory = newStockList;
+		initialCoins = coins;
 
 		init();
 	}
@@ -46,19 +46,22 @@ public class VendingMachine {
 			return;
 		}
 
-		if (!Utils.isAcceptable(coins, acceptableCoins))
+		if (!Utils.isAcceptable(coins, acceptableCoins)) {
 			return;
+		}
 
 		// --- update products
 		for (Map.Entry<Product, Integer> items : inventory.entrySet()) {
 			Product product = items.getKey();
 			int total = items.getValue();
 
-			if (total < 1)
+			if (total < 1) {
 				return;
+			}
 			double amount = 0;
-			for (Coin coin : coins)
+			for (Coin coin : coins) {
 				amount += coin.getAmount();
+			}
 
 			if (product == item && amount >= product.getPrice()) {
 				items.setValue(items.getValue() - 1);
@@ -68,8 +71,9 @@ public class VendingMachine {
 				// --- update balance
 				updateBalance(coins);
 
-				if (amount > product.getPrice())
+				if (amount > product.getPrice()) {
 					makeChange(product.getPrice(), amount);
+				}
 			}
 		}
 	}

@@ -1,16 +1,12 @@
 package com.vending.machine.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 @Table(name = "coin")
 @Entity
-public class Coin extends AuditModel {
+public class Coin extends AuditModel implements Comparable<Coin> {
 	/**
 	 * 
 	 */
@@ -19,22 +15,24 @@ public class Coin extends AuditModel {
 	@GeneratedValue(generator = "coin_genderator")
 	@SequenceGenerator(name = "coin_generator", sequenceName = "coin_sequence", initialValue = 100)
 	private Long id;
-
+	@Min(message = "Number of coins cannot be negative", value = 0)
+	private int count;
 	@Min(message = "Value cannot be negative", value = 0)
 	private double amount;
 	@Size(min = 2, max = 10, message = "Description must be between {min} and {max} characters")
 	private String description;
 
 	public Coin() {
-		this.amount = 0;
-		this.description = "";
+		amount = 0;
+		description = "";
 	}
 
 	public Coin(@Min(message = "Value cannot be negative", value = 0) double amount,
-			@Size(min = 2, max = 10, message = "Description must be between {min} and {max} characters") String description) {
+				@Size(min = 2, max = 10, message = "Description must be between {min} and {max} characters") String description, int count) {
 		super();
 		this.amount = amount;
 		this.description = description;
+		this.count = count;
 	}
 
 	public Long getId() {
@@ -49,12 +47,12 @@ public class Coin extends AuditModel {
 		return amount;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
 	public void setAmount(double amount) {
 		this.amount = amount;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	public void setDescription(String description) {
@@ -62,23 +60,40 @@ public class Coin extends AuditModel {
 	}
 
 	@Override
+	public String toString() {
+		return description + amount / 100;
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
+		}
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		Coin coin = (Coin) obj;
-		return (coin.getAmount() == getAmount() && coin.getDescription().equals(getDescription()));
+		return (coin.getAmount() == getAmount()
+				&& coin.getDescription().equals(getDescription())
+				&& coin.getCount() == getCount());
 
 		// return true;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 43;
+		int prime = 43;
 		int result = 1;
 
 		result = prime * result + (getId().hashCode());
@@ -86,5 +101,26 @@ public class Coin extends AuditModel {
 		result = prime * result + getDescription().hashCode();
 
 		return result;
+	}
+
+	@Override
+	public int compareTo(Coin coin) {
+		int BEFORE = -1;
+		int EQUAL = 0;
+		int AFTER = 1;
+
+		if (this == coin) {
+			return EQUAL;
+		}
+
+		if (amount < coin.getAmount()) {
+			return BEFORE;
+		}
+		if (amount > coin.getAmount()) {
+			return AFTER;
+		}
+
+		return EQUAL;
+
 	}
 }
