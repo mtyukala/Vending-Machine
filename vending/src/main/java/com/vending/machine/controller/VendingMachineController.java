@@ -8,12 +8,14 @@ import com.vending.machine.repository.ProductRepository;
 import com.vending.machine.repository.PurchaseRepository;
 import com.vending.machine.utils.ResourceNotFoundException;
 import com.vending.machine.utils.Utils;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,6 +23,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
+
+//import io.swagger.annotations.ApiOperation;
 
 /**
  * Class to define methods to perform operations on products
@@ -29,8 +34,9 @@ import java.util.Map;
  */
 @RestController
 @Transactional
-@RequestMapping("/")
 public class VendingMachineController {
+    @Value("${spring.application.name}")
+    String appName;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -38,31 +44,39 @@ public class VendingMachineController {
     @Autowired
     private PurchaseRepository purchaseRepository;
 
-    @ApiOperation(value = "List all products in the system")
+    @GetMapping("/")
+    public String homePage(Model model) {
+        model.addAttribute("appName", appName);
+        return "home";
+    }
+
+
+    //@ApiOperation(value = "List all products in the system")
     @GetMapping("/api/products")
     public Page<Product> getProducts(Pageable pageable) {
         return productRepository.findAll(pageable);
     }
 
-    @ApiOperation(value = "List all acceptable coins in the system")
+    //@ApiOperation(value = "List all acceptable coins in the system")
     @GetMapping("/api/coins")
     public Page<Coin> getCoins(Pageable pageable) {
         return coinRepository.findAll(pageable);
     }
 
-    @ApiOperation(value = "Add a new product in the system")
+    //@ApiOperation(value = "Add a new product in the system")
     @PostMapping("/api/products")
     public Product createProducts(@Valid @RequestBody Product product) {
         return productRepository.save(product);
     }
 
-    @ApiOperation(value = "Add a new coin into the system")
+    //@ApiOperation(value = "Add a new coin into the system")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/coins")
     public Coin createCoin(@Valid @RequestBody Coin coin) {
         return coinRepository.save(coin);
     }
 
-    @ApiOperation(value = "Update a product")
+    //@ApiOperation(value = "Update a product")
     @PutMapping("/api/products/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
         return productRepository.findById(id).map(p -> {
@@ -73,7 +87,7 @@ public class VendingMachineController {
         }).orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
     }
 
-    @ApiOperation(value = "Delete a Product")
+    ////@ApiOperation(value = "Delete a Product")
     @DeleteMapping("/api/products/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         if (!productRepository.existsById(id)) {
@@ -96,7 +110,7 @@ public class VendingMachineController {
 
     }
 
-    @ApiOperation(value = "Create a new purchase into the system")
+    ////@ApiOperation(value = "Create a new purchase into the system")
     @PostMapping("/api/buy")
     public Map<Product, List<Coin>> buy(@Valid @RequestBody Product product, @Valid @RequestBody List<Coin> coins) {
 
@@ -168,9 +182,7 @@ public class VendingMachineController {
         for (Coin coin : coins) {
             if (amount > coin.getAmount()) {
                 int money = (int) (amount / coin.getAmount());
-                for (int i = 0; i < money; i++) {
-                    list.add(coin);
-                }
+                IntStream.range(0, money).mapToObj(i -> coin).forEachOrdered(list::add);
 
                 amount -= money;
             }
