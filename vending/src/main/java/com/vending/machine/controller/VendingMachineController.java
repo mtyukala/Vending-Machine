@@ -8,6 +8,7 @@ import com.vending.machine.repository.ProductRepository;
 import com.vending.machine.repository.PurchaseRepository;
 import com.vending.machine.utils.ResourceNotFoundException;
 import com.vending.machine.utils.Utils;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -15,8 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -24,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
-
-//import io.swagger.annotations.ApiOperation;
 
 /**
  * Class to define methods to perform operations on products
@@ -45,38 +44,41 @@ public class VendingMachineController {
     private PurchaseRepository purchaseRepository;
 
     @GetMapping("/")
-    public String homePage(Model model) {
-        model.addAttribute("appName", appName);
-        return "home";
+    public ModelAndView homePage() {
+        ModelAndView model = new ModelAndView("home");
+        model.addObject("appName", appName);
+        model.addObject("products", productRepository.findAll());
+        model.addObject("coins", coinRepository.findAll());
+        return model;
     }
 
 
-    //@ApiOperation(value = "List all products in the system")
+    @ApiOperation(value = "List all products in the system")
     @GetMapping("/api/products")
     public Page<Product> getProducts(Pageable pageable) {
         return productRepository.findAll(pageable);
     }
 
-    //@ApiOperation(value = "List all acceptable coins in the system")
+    @ApiOperation(value = "List all acceptable coins in the system")
     @GetMapping("/api/coins")
     public Page<Coin> getCoins(Pageable pageable) {
         return coinRepository.findAll(pageable);
     }
 
-    //@ApiOperation(value = "Add a new product in the system")
+    @ApiOperation(value = "Add a new product in the system")
     @PostMapping("/api/products")
     public Product createProducts(@Valid @RequestBody Product product) {
         return productRepository.save(product);
     }
 
-    //@ApiOperation(value = "Add a new coin into the system")
+    @ApiOperation(value = "Add a new coin into the system")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/coins")
     public Coin createCoin(@Valid @RequestBody Coin coin) {
         return coinRepository.save(coin);
     }
 
-    //@ApiOperation(value = "Update a product")
+    @ApiOperation(value = "Update a product")
     @PutMapping("/api/products/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
         return productRepository.findById(id).map(p -> {
@@ -87,7 +89,9 @@ public class VendingMachineController {
         }).orElseThrow(() -> new ResourceNotFoundException("Product with " + id + " not found."));
     }
 
-    ////@ApiOperation(value = "Delete a Product")
+    @ApiOperation(value = "Delete a Product")
+
+
     @DeleteMapping("/api/products/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         if (!productRepository.existsById(id)) {
@@ -177,7 +181,9 @@ public class VendingMachineController {
 
         List<Coin> list = Collections.emptyList();
         List<Coin> coins = coinRepository.findAll(); // coins are unique in the system
-        Collections.sort(coins); // sort from Large to Small
+
+        // --- sort from Large to Small. See the compareTo(T, T)
+        Collections.sort(coins);
 
         for (Coin coin : coins) {
             if (amount > coin.getAmount()) {

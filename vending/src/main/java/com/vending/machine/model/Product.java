@@ -1,10 +1,6 @@
 package com.vending.machine.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -27,7 +23,7 @@ public class Product extends AuditModel {
 	@SequenceGenerator(name = "product_generator", sequenceName = "product_sequence", initialValue = 100)
 	private Long id;
 	@NotNull(message = "Please, enter a description of the product")
-	@Size(min = 5, max = 50, message = "Description must be between {min} and {max} characters")
+	@Size(min = 2, max = 50, message = "Description must be between {min} and {max} characters")
 	private String name;
 	@Min(message = "Price cannot be negative", value = 0)
 	private float price;
@@ -62,8 +58,16 @@ public class Product extends AuditModel {
 		return name;
 	}
 
+	public void setName(@NotNull String name) {
+		this.name = name;
+	}
+
 	public float getPrice() {
 		return price;
+	}
+
+	public void setPrice(float price) {
+		this.price = price;
 	}
 
 	public int getItems() {
@@ -78,25 +82,23 @@ public class Product extends AuditModel {
 		return weight;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setPrice(float price) {
-		this.price = price;
+	public void setWeight(float weight) {
+		this.weight = weight;
 	}
 
 	@Override
 	public String toString() {
-		return this.name + "(" + this.weight + ") x(" +this.items+") @ " + this.price;
+		return name + "(" + weight + ") x(" + items + ") @ " + price;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
+		}
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
@@ -109,7 +111,7 @@ public class Product extends AuditModel {
 
 	@Override
 	public int hashCode() {
-		final int prime = 41;
+		int prime = 41;
 		int result = 1;
 
 		result = prime * result + (getId().hashCode());
@@ -121,16 +123,12 @@ public class Product extends AuditModel {
 		return result;
 	}
 
-	public void setWeight(float weight) {
-		this.weight = weight;
-	}
-
 	public String getPictureURL() {
 		return pictureURL;
 	}
 
 	public void setPictureURL(String pictureURLString) {
-		this.pictureURL = pictureURLString;
+		pictureURL = pictureURLString;
 	}
 
 }

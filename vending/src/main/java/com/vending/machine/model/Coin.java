@@ -2,6 +2,7 @@ package com.vending.machine.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Table(name = "coin")
@@ -20,6 +21,7 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 	@Min(message = "Value cannot be negative", value = 0)
 	private double amount;
 	@Size(min = 2, max = 10, message = "Description must be between {min} and {max} characters")
+	@NotNull
 	private String description;
 
 	public Coin() {
@@ -55,7 +57,7 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(@NotNull String description) {
 		this.description = description;
 	}
 

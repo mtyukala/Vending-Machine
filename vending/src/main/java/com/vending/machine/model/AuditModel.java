@@ -1,18 +1,16 @@
 package com.vending.machine.model;
 
-import java.io.Serializable;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
+import java.util.Date;
 
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = { "createOn", "updatedOn" }, allowGetters = true)
@@ -32,11 +30,12 @@ public abstract class AuditModel implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@CreatedDate
 	@Column(name = "create_on", nullable = false, updatable = false)
-	private Date createOn;
+	private Date createOn = new Date(System.currentTimeMillis());
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "update_on", nullable = false)
 	@LastModifiedDate
-	private Date updatedOn;
+	private Date updatedOn = new Date(System.currentTimeMillis());
+
 
 	public Date getCreateOn() {
 		return createOn;
