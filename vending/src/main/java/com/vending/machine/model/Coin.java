@@ -21,12 +21,12 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 	@Min(message = "Value cannot be negative", value = 0)
 	private double amount;
 	@Size(min = 2, max = 10, message = "Description must be between {min} and {max} characters")
-	@NotNull
+    @NotNull(message = "Description of the coin eg: R2")
 	private String description;
 
 	public Coin() {
-		amount = 0;
-		description = "";
+        amount = 0;
+        description = "";
 	}
 
 	public Coin(@Min(message = "Value cannot be negative", value = 0) double amount,

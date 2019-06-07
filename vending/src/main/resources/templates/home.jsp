@@ -9,18 +9,19 @@
     <meta name="description" content="Vending Machine Application">
     <meta name="author" content="Mkhululi Tyukala">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet"/>
+
+
     <title>Home Page</title></head>
 <body>
 <div class="container">
-    <div id="products" class="col-sm-9 ">
-        <ul>
-            <li style="list-style-type:none" v-for="product in products">
-                <player-card
-                        v-bind:product="product" v-bind:key="product.id">
-                </player-card>
-            </li>
-        </ul>
-    </div>
+    <noscript>
+        <strong>
+            Sorry application does not work without Javascript enabled. Enable javascript to continue.
+        </strong>
+    </noscript>
+
+    <div id="products"></div>
+    <div id="app"></div>
     <div class="lead">
         <strong>
             <span th:text="${appName}"></span>
@@ -39,35 +40,16 @@
             </div>
         </div>
     </section>
-
 </div>
 
-<script
-        src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js">
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.min.js">
 </script>
-<script
-        src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js">
 </script>
+<script type="text/javascript" th:src="@{/js/main.js}"></script>
 <script type="text/babel">
 
 
-    Vue.component('products',
-        props
-    :
-    ['product'],
-        template
-    :
-    `<div class="card">
-<div class="card-body">
-<h6 class="card-title">
-{{product.name}}
-</h6>
-<p class="card-text"><div>{{product.price}}</div>
-</p>
-</div>
-</div>`
-    )
-    ;
     var app = new Vue({
         el: '#products',
         data: {

@@ -31,6 +31,7 @@ import java.util.stream.IntStream;
  *
  * @author Mkhululi Tyukala
  */
+@CrossOrigin // --- not sure about security considerations
 @RestController
 @Transactional
 public class VendingMachineController {
