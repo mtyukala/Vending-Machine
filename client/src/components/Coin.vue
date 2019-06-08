@@ -1,23 +1,10 @@
 <template>
-    <div class="products container">
-        <div class="title" style="margin-bottom:40px;">
-            <h3>Coins in the System</h3>
-        </div>
-        <div class="row">
-            <div class="col-sm-2">
-                <h4>#</h4>
-            </div>
-            <div class="col-sm-8">
-                <h4>Coin Details</h4>
-            </div>
-            <div class="col-sm-2">
-                <h4>GO TO</h4>
-            </div>
-        </div>
+    <div class="coins container">
+
 
         <template v-for="coin in coins">
             <div class="row" style="margin-bottom:20px;">
-                <div class="col-sm-2" >
+                <div class="col-sm-2">
                     <p>{{ coin.id }}</p>
                 </div>
                 <div class="col-sm-8">
@@ -41,26 +28,32 @@
     import axios from 'axios'
 
     export default {
-        name:'Coins',
-        data(){
+        name: 'Coins',
+        data() {
             return {
-                coins:[]
+                coins: []
             }
         },
-        mounted:function(){
+        methods: {},
+        created() {
             axios.get(
                 'http://localhost:8084/api/coins'
             ).then(
-                result=>{
-                    console.log(result);
-                    this.coins=result.data;
+                result => {
+                    console.log(result.data);
+                    this.coins = result.data;
                 }
-            )
+            ).catch(error => console.log(error))
+        },
+        mounted: function () {
+
         }
     }
 </script>
 <!--scoped means this stylesheet is limited for this vue file-->
 <style scoped>
-
+.coins{
+    display: block;
+}
 
 </style>

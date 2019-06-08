@@ -20,6 +20,10 @@
   padding: 30px;
 }
 
+.home{
+  text-align: left;
+}
+
 #nav a {
   font-weight: bold;
   color: #2c3e50;

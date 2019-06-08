@@ -1,63 +1,95 @@
 <template>
     <div class="products container">
-        <div class="title" style="margin-bottom:40px;">
-            <h3>Products on Sale</h3>
+        <div v-show='toggle' class="" id="product_form">
+            <AddProduct />
         </div>
-        <div class="row">
-            <div class="col-sm-2">
-                <h4>#</h4>
-            </div>
-            <div class="col-sm-8">
-                <h4>Product Details</h4>
-            </div>
-            <div class="col-sm-2">
-                <h4>GO TO</h4>
-            </div>
+        <div class="btn-bar">
+            <button @click="toggle = !toggle" class="btn btn-success"> Add New...</button>
+            <button @click="refresh" class="btn btn-secondary">Refresh</button>
         </div>
-    <template v-for="product in products">
-        <div class="row" style="margin-bottom:20px;">
-            <div class="col-sm-2" >
-                <p>{{ product.id }}</p>
+        <template v-for="product in products">
+            <div class="card" style="margin-bottom:20px;">
+                <div class="col-sm-8">
+                    <p><strong>{{ product.name }}<span>&nbsp;x{{product.items}}</span></strong></p>
+                </div><div class="col-sm-8">
+                    <p>R{{ product.price }}</p>
+                </div>
+
+                <div class="col-sm-8">
+                    <router-link :to="{path: '/api/products/'+product.id }">View Product</router-link>
+                    <div>
+                        <!--<Coins/>-->
+                        Buy Product
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-8">
-                <p>{{ product.name }}</p>
-            </div>
-            <div class="col-sm-2">
-                <router-link :to="{path: '/api/products/'+product.id }">View Product</router-link>
-            </div>
-        </div>
-    </template>
+        </template>
     </div>
-</template><script>
+</template>
+<script>
 
     import axios from 'axios'
+    import Vue from 'vue'
+    import BootstrapVue from 'bootstrap-vue'
+    import AddProduct from '@/components/AddProduct.vue'
+    import Coins from '@/components/Coin.vue'
+    Vue.use(BootstrapVue)
 
+    const BASE_URL = 'http://localhost:8084/api/products';
     export default {
-        name:'Products',
-        data(){
+        name: 'Products',
+        data() {
             return {
-                products:[]
+                products: [],
+                toggle:false,
             }
         },
-        methods:{
+        methods: {
+            addProduct(newProduct){
+                this.products = [...this.products, newProduct];
+            },
+            load(e){
+                axios.get(
+                    BASE_URL
+                ).then(
+                    result => {
+                        console.log(result.data);
+                        this.products = result.data;
+                    }
+                ).catch(error => console.log(error))
+            },
+            refresh(e){
+                this.load(e);
+            }
 
         },
-        created(){
-            axios.get(
-                'http://localhost:8084/api/products'
-            ).then(
-                result=>{
-                    console.log(result);
-                    this.products=result.data;
-                }
-            ).catch(error=>console.log(error))
+        created() {
+            this.load();
         },
-        mounted:function(){
+        mounted: function () {
 
+        },
+        components:{
+            AddProduct,
+            Coins,
         }
     }
 </script>
-<style>h3{
+<style>h3 {
     margin: 40px 0 0;
 }
+    .card{
+        float: left;
+        margin-right: 10px;
+        padding: 20px;
+        text-align: center;
+        width: 30em;
+    }
+    .btn-bar{
+        margin-bottom: 2em;
+        text-align: center;
+    }
+    .btn-bar button{
+        margin-right: 10px;
+    }
 </style>

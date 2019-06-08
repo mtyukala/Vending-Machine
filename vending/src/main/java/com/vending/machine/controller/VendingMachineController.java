@@ -11,8 +11,6 @@ import com.vending.machine.utils.Utils;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,14 +54,14 @@ public class VendingMachineController {
 
     @ApiOperation(value = "List all products in the system")
     @GetMapping("/api/products")
-    public Page<Product> getProducts(Pageable pageable) {
-        return productRepository.findAll(pageable);
+    public List<Product> getProducts() {
+        return productRepository.findAll();
     }
 
     @ApiOperation(value = "List all acceptable coins in the system")
     @GetMapping("/api/coins")
-    public Page<Coin> getCoins(Pageable pageable) {
-        return coinRepository.findAll(pageable);
+    public List<Coin> getCoins() {
+        return coinRepository.findAll();
     }
 
     @ApiOperation(value = "Add a new product in the system")

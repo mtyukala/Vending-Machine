@@ -9,6 +9,7 @@
     }
 </script>
 <style scoped>
-    header{}
+    header{
+        text-align: center;}
     header a{}
 </style>
