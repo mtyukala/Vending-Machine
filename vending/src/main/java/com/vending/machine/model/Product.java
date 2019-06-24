@@ -12,18 +12,19 @@ import javax.validation.constraints.Size;
  */
 @Table(name = "product")
 @Entity
-public class Product extends AuditModel {
+public class Product extends AuditModel implements Comparable<Product> {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
+
     @Id
-    @GeneratedValue(generator = "product_generator")
-    @SequenceGenerator(name = "product_generator", sequenceName = "product_sequence", initialValue = 100)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "product_generator")
     private Long id;
+
     @NotNull(message = "Please, enter a description of the product")
-    @Size(min = 2, max = 50, message = "Description must be between {min} and {max} characters")
     private String name;
+
     @Min(message = "Price cannot be negative", value = 0)
     private float price;
     private float weight;
@@ -32,17 +33,24 @@ public class Product extends AuditModel {
 
     public Product() {
 
+        name = "";
+        price = 0;
+        weight = 0;
+        items = 0;
+        pictureURL = "";
+        //  logger.info("Create empty product");
     }
 
-    public Product(
-            @NotNull(message = "Please, enter a description of the product") @Size(min = 5, max = 50, message = "Description must be between {min} and {max} characters") String name,
-            @Min(message = "Price cannot be negative", value = 0) float price, float weight, int items, String pictureURL) {
+    public Product(Long id,
+                   @NotNull(message = "Please, enter a description of the product") @Size(min = 5, max = 50, message = "Description must be between {min} and {max} characters") String name,
+                   @Min(message = "Price cannot be negative", value = 0) float price, float weight, int items, String pictureURL) {
         super();
+        this.id = id;
         this.name = name;
         this.price = price;
         this.weight = weight;
         this.items = items;
-        this.pictureURL = pictureURL;
+        this.pictureURL = pictureURL != null ? pictureURL : "";
     }
 
     public Long getId() {
@@ -117,7 +125,7 @@ public class Product extends AuditModel {
         result = prime * result + Long.valueOf(Double.doubleToLongBits(getPrice())).hashCode();
         result = prime * result + getName().hashCode();
         result = prime * result + Long.valueOf(Double.doubleToLongBits(getWeight())).hashCode();
-        result = prime * result + getPictureURL().hashCode();
+        //  result = prime * result + getPictureURL().hashCode();
 
         return result;
     }
@@ -130,4 +138,31 @@ public class Product extends AuditModel {
         pictureURL = pictureURLString;
     }
 
+    @Override
+    public int compareTo(Product product) {
+        int BEFORE = -1;
+        int EQUAL = 0;
+        int AFTER = 1;
+
+        if (this == product) {
+            return EQUAL;
+        }
+
+        if (items < product.getItems()) {
+            return BEFORE;
+        }
+        if (getItems() > product.getItems()) {
+            return AFTER;
+        }
+
+        if (price < product.getPrice()) {
+            return BEFORE;
+        }
+        if (price > product.getPrice()) {
+            return AFTER;
+        }
+
+        return EQUAL;
+
+    }
 }

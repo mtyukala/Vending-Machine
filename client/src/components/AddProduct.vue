@@ -34,7 +34,7 @@
                         <div>
                             <span>
                                 <input min="0.01" max="200.00" name="price" type="number" step="0.01" v-model="price"
-                                       placeholder="R0.00"
+                                       placeholder="0.00"
                                        class="field text currency small"
                                        />
 

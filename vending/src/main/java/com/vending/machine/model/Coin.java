@@ -13,14 +13,14 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 	 */
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(generator = "coin_genderator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "coin_generator")
 	@SequenceGenerator(name = "coin_generator", sequenceName = "coin_sequence", initialValue = 100)
-	private Long id;
+    private Long cid;
 	@Min(message = "Number of coins cannot be negative", value = 0)
 	private int count;
 	@Min(message = "Value cannot be negative", value = 0)
 	private double amount;
-	@Size(min = 2, max = 10, message = "Description must be between {min} and {max} characters")
+    @Size(min = 1, max = 10, message = "Description must be between {min} and {max} characters")
     @NotNull(message = "Description of the coin eg: R2")
 	private String description;
 
@@ -37,12 +37,12 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 		this.count = count;
 	}
 
-	public Long getId() {
-		return id;
-	}
+    public Long getCid() {
+        return cid;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
+    public void setCid(Long prodID) {
+        cid = prodID;
 	}
 
 	public double getAmount() {
@@ -74,7 +74,8 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 		this.count = count;
 	}
 
-	@Override
+
+    @Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -98,7 +99,7 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 		int prime = 43;
 		int result = 1;
 
-		result = prime * result + (getId().hashCode());
+        result = prime * result + (getCid().hashCode());
 		result = prime * result + Long.valueOf(Double.doubleToLongBits(getAmount())).hashCode();
 		result = prime * result + getDescription().hashCode();
 

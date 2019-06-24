@@ -1,6 +1,6 @@
 package com.vending.machine.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vending.machine.utils.Utils;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -9,33 +9,45 @@ import java.util.List;
 
 @Entity
 @Table(name = "purchase")
-public class Purchase {
+public class Purchase extends AuditModel implements Comparable<Purchase> {
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "purchase_generator")
+    private Long pid;
     @Column(nullable = false)
     private Integer quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name="product_id", nullable = false)
+    @JoinColumn(name = "id")
     private Product product;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "coin_id", nullable = false)
-    private List<Coin> coins;
+    private Double amount;
 
     public Purchase() {
         super();
+        pid = 0L;
+        product = new Product();
+        amount = 0D;
+        quantity = 0;
+    }
+
+    public Purchase(Double amount, Product product, Integer quantity) {
+        setAmount(amount);
+        setProduct(product);
+        this.quantity = quantity;
     }
 
     public Purchase(List<Coin> coins, Product product, Integer quantity) {
-        // pk = new PurchaseCoinPK();
-        setCoins(coins);
-        setProduct(product);
-        this.quantity = quantity;
+        this(Utils.getAmount(coins),
+                product, quantity);
+    }
+
+    public Long getPid() {
+        return pid;
+    }
+
+    public void setPid(Long pid) {
+        this.pid = pid;
     }
 
     public Product getProduct() {
@@ -46,12 +58,12 @@ public class Purchase {
         this.product = product;
     }
 
-    public List<Coin> getCoins() {
-        return coins;
+    public Double getAmount() {
+        return amount;
     }
 
-    public void setCoins(List<Coin> coins) {
-        this.coins = coins;
+    public void setAmount(Double amount) {
+        this.amount = amount;
     }
 
     public Integer getQuantity() {
@@ -74,11 +86,11 @@ public class Purchase {
             return false;
         }
         Purchase other = (Purchase) obj;
-        if (coins == null) {
+        if (amount == null) {
             return false;
         } else if (!product.equals(other.getProduct())) {
             return false;
-        } else if (!coins.equals(other.getCoins())) {
+        } else if (!amount.equals(other.getAmount())) {
             return false;
         } else if (quantity != other.getQuantity()) {
             return false;
@@ -86,4 +98,39 @@ public class Purchase {
         return true;
     }
 
+    @Override
+    public int compareTo(Purchase purchase) {
+        int BEFORE = -1;
+        int EQUAL = 0;
+        int AFTER = 1;
+
+        if (this == purchase) {
+            return EQUAL;
+        }
+
+        if (amount < purchase.getAmount()) {
+            return BEFORE;
+        }
+        if (amount > purchase.getAmount()) {
+            return AFTER;
+        }
+
+        if (quantity < purchase.getQuantity()) {
+            return BEFORE;
+        }
+        if (quantity > purchase.getQuantity()) {
+            return AFTER;
+        }
+
+        return EQUAL;
+
+    }
+
+    @Override
+    public String toString() {
+        String result = "[Purchase Details, " + product.toString();
+        result += ", Amount = " + amount;
+        result += ", Quantity = " + quantity;
+        return result + "]";
+    }
 }

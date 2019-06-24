@@ -9,9 +9,12 @@ import com.vending.machine.repository.PurchaseRepository;
 import com.vending.machine.utils.ResourceNotFoundException;
 import com.vending.machine.utils.Utils;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 /**
  * Class to define methods to perform operations on products
@@ -35,6 +37,7 @@ import java.util.stream.IntStream;
 public class VendingMachineController {
     @Value("${spring.application.name}")
     String appName;
+    Logger logger = LoggerFactory.getLogger(VendingMachineController.class);
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -65,6 +68,7 @@ public class VendingMachineController {
     }
 
     @ApiOperation(value = "Add a new product in the system")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/products")
     public Product createProducts(@Valid @RequestBody Product product) {
         return productRepository.save(product);
@@ -89,8 +93,6 @@ public class VendingMachineController {
     }
 
     @ApiOperation(value = "Delete a Product")
-
-
     @DeleteMapping("/api/products/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         if (!productRepository.existsById(id)) {
@@ -103,6 +105,8 @@ public class VendingMachineController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation(value = "Update Coin")
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/api/coins/{id}")
     public ResponseEntity<Coin> updateCoin(@PathVariable Long id, @Valid @RequestBody Coin coin) {
         return coinRepository.findById(id).map(c -> {
@@ -113,19 +117,30 @@ public class VendingMachineController {
 
     }
 
-    ////@ApiOperation(value = "Create a new purchase into the system")
-    @PostMapping("/api/buy")
-    public Map<Product, List<Coin>> buy(@Valid @RequestBody Product product, @Valid @RequestBody List<Coin> coins) {
+    @ApiOperation(value = "Create a purchase")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(value = "/api/buy", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public List<Coin> buy(@RequestBody Purchase purchase) {
+        logger.info(purchase.toString());
+        logger.info(purchase.getProduct().toString());
+        Long id = purchase.getProduct().getId();
+        if (id == null) {
+            throw new ResourceNotFoundException("Product cannot be determined for this purchase");
+        }
+        logger.info(id == null ? "product id is null" : id.toString());
 
-        Product productToBuy = productRepository.findById(product.getId()).orElseThrow(() -> new ResourceNotFoundException("Product with name" + product.getName() + " not found"));
+        List<Coin> coins = Utils.toCoin(coinRepository.findAll(), purchase.getAmount());
+        List<Coin> systemCoins = coinRepository.findAll();
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product with [id] " + id + " not found"));
+        logger.error(coins.toString());
 
-        if (!Utils.isAcceptable(coins, coins)) {
+        if (!Utils.isAcceptable(coins, systemCoins)) {
             throw new ResourceNotFoundException("The inserted coins are not acceptable");
         }
 
         // --- update products
-        if (productToBuy.getItems() < 1) {
-            throw new ResourceNotFoundException("Products put of stock");
+        if (product.getItems() < 1) {
+            throw new ResourceNotFoundException("Products out of stock");
         }
 
         double amount = 0;
@@ -142,7 +157,7 @@ public class VendingMachineController {
         productRepository.save(product);
 
         // --- save purchase
-        Purchase purchase = new Purchase(coins, product, 1);
+        //Purchase purchase = new Purchase(coins, product, 1);
         purchaseRepository.save(purchase);
 
         // --- update coins work out change
@@ -159,7 +174,55 @@ public class VendingMachineController {
         // --- return change TODO
         Map<Product, List<Coin>> response = new HashMap<>();
         response.put(product, change);
-        return response;
+        return change;
+    }
+
+    @PostMapping("/api/purchase/{id}")
+    public List<Coin> buy(@PathVariable Long id, @RequestBody List<Coin> coins) {
+
+        Product productToBuy = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product with name" + id + " not found"));
+        System.out.println("Product = " + productToBuy);
+        if (!Utils.isAcceptable(coins, coins)) {
+            throw new ResourceNotFoundException("The inserted coins are not acceptable");
+        }
+
+        // --- update products
+        if (productToBuy.getItems() < 1) {
+            throw new ResourceNotFoundException("Products out of stock");
+        }
+
+        double amount = 0;
+        for (Coin coin : coins) {
+            amount += coin.getAmount();
+        }
+
+        if (amount < productToBuy.getPrice()) {
+            throw new ResourceNotFoundException("Insufficient coins");
+        }
+
+        // --- update products
+        productToBuy.setItems(productToBuy.getItems() - 1);
+        productRepository.save(productToBuy);
+
+        // --- save purchase
+        Purchase purchase = new Purchase(coins, productToBuy, 1);
+        purchaseRepository.save(purchase);
+
+        // --- update coins work out change
+        coinRepository.saveAll(coins);
+        List<Coin> change = Collections.emptyList();
+        if (amount > productToBuy.getPrice()) {
+            change = makeChange(productToBuy.getPrice() - amount);
+            for (Coin coin : change) {
+                coin.setCount(coin.getCount() - 1);
+                coinRepository.save(coin);
+            }
+        }
+
+        // --- return change TODO
+        // Map<Long, List<Coin>> response = new HashMap<>();
+        // response.put(change);
+        return change;
     }
 
     @GetMapping("/api/cancel")
@@ -174,24 +237,6 @@ public class VendingMachineController {
      * @return list of coins as a change for the purchase
      */
     public List<Coin> makeChange(double amount) {
-        if (amount <= 0) {
-            return Collections.emptyList();
-        }
-
-        List<Coin> list = Collections.emptyList();
-        List<Coin> coins = coinRepository.findAll(); // coins are unique in the system
-
-        // --- sort from Large to Small. See the compareTo(T, T)
-        Collections.sort(coins);
-
-        for (Coin coin : coins) {
-            if (amount > coin.getAmount()) {
-                int money = (int) (amount / coin.getAmount());
-                IntStream.range(0, money).mapToObj(i -> coin).forEachOrdered(list::add);
-
-                amount -= money;
-            }
-        }
-        return list;
+        return Utils.toCoin(coinRepository.findAll(), amount);
     }
 }

@@ -69,7 +69,7 @@ public class VendingMachine {
 				// --- update coins
 
 				// --- update balance
-				updateBalance(coins);
+				updateBalance(amount);
 
 				if (amount > product.getPrice()) {
 					makeChange(product.getPrice(), amount);

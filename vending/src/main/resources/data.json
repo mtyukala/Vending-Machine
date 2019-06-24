@@ -1,0 +1,112 @@
+[
+    {
+        "createdOn": "2019-06-19T11:31:07.935+0000",
+        "updatedOn": "2019-06-19T11:31:07.935+0000",
+        "id": 1,
+        "name": "Coke",
+        "price": 9.99,
+        "weight": 0.5,
+        "items": 50,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.941+0000",
+        "updatedOn": "2019-06-19T11:31:07.941+0000",
+        "id": 100,
+        "name": "Sprite",
+        "price": 9.99,
+        "weight": 0.5,
+        "items": 10,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.941+0000",
+        "updatedOn": "2019-06-19T11:31:07.941+0000",
+        "id": 101,
+        "name": "Bar One",
+        "price": 6.99,
+        "weight": 0.25,
+        "items": 10,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.941+0000",
+        "updatedOn": "2019-06-19T11:31:07.941+0000",
+        "id": 102,
+        "name": "Peanuts",
+        "price": 8.99,
+        "weight": 0.3,
+        "items": 10,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.941+0000",
+        "updatedOn": "2019-06-19T11:31:07.941+0000",
+        "id": 103,
+        "name": "Maize Pops",
+        "price": 4,
+        "weight": 0.3,
+        "items": 10,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.942+0000",
+        "updatedOn": "2019-06-19T11:31:07.942+0000",
+        "id": 104,
+        "name": "Corn Bites",
+        "price": 6.99,
+        "weight": 0.3,
+        "items": 10,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.942+0000",
+        "updatedOn": "2019-06-19T11:31:07.942+0000",
+        "id": 105,
+        "name": "Niknaks",
+        "price": 1.99,
+        "weight": 0.2,
+        "items": 15,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.942+0000",
+        "updatedOn": "2019-06-19T11:31:07.942+0000",
+        "id": 151,
+        "name": "Amasi",
+        "price": 20,
+        "weight": 0.5,
+        "items": 12,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.942+0000",
+        "updatedOn": "2019-06-19T11:31:07.942+0000",
+        "id": 152,
+        "name": "Candy",
+        "price": 0.2,
+        "weight": 0,
+        "items": 50,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.942+0000",
+        "updatedOn": "2019-06-19T11:31:07.942+0000",
+        "id": 153,
+        "name": "Sandwich",
+        "price": 30,
+        "weight": 0,
+        "items": 5,
+        "pictureURL": null
+    },
+    {
+        "createdOn": "2019-06-19T11:31:07.942+0000",
+        "updatedOn": "2019-06-19T11:31:07.942+0000",
+        "id": 2,
+        "name": "Simba Chips",
+        "price": 6.99,
+        "weight": 0.3,
+        "items": 8,
+        "pictureURL": null
+    }
+]

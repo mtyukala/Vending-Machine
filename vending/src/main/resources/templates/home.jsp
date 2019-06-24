@@ -20,8 +20,8 @@
         </strong>
     </noscript>
 
-    <div id="products"></div>
-    <div id="app"></div>
+    <div pid="products"></div>
+    <div pid="app"></div>
     <div class="lead">
         <strong>
             <span th:text="${appName}"></span>
@@ -30,7 +30,7 @@
     <section th:each="p : ${products}">
         <div class="col-sm-4">
             <div class="panel panel-default">
-                <a style="text-decoration:none" th:href="@{/api/products/{id}(id=${p.Id})}">
+                <a style="text-decoration:none" th:href="@{/api/products/{pid}(pid=${p.Id})}">
                     <span class="panel-body">
                         <span th:text="${p.name}"/></span>&nbsp; (x<span th:text="${p.items}"></span>)
                     <p th:text="${p.price}"/></p>
@@ -54,9 +54,9 @@
         el: '#products',
         data: {
             products: [
-                {id: "1", name: "Coke", "price": "9.99", "items": "10", "weight": "0.5"},
-                {id: "2", name: "Fanta", "price": "9.99", "items": "10", "weight": "0.5"},
-                {id: "3", name: "Simba Chips", "price": "5.99", "items": "15", "weight": "0.2"}
+                {pid: "1", name: "Coke", "price": "9.99", "items": "10", "weight": "0.5"},
+                {pid: "2", name: "Fanta", "price": "9.99", "items": "10", "weight": "0.5"},
+                {pid: "3", name: "Simba Chips", "price": "5.99", "items": "15", "weight": "0.2"}
             ]
         }
     });

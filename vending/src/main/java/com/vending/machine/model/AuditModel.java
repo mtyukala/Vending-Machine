@@ -30,19 +30,19 @@ public abstract class AuditModel implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@CreatedDate
 	@Column(name = "create_on", nullable = false, updatable = false)
-	private Date createOn = new Date(System.currentTimeMillis());
+	private Date createdOn = new Date(System.currentTimeMillis());
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "update_on", nullable = false)
 	@LastModifiedDate
 	private Date updatedOn = new Date(System.currentTimeMillis());
 
 
-	public Date getCreateOn() {
-		return createOn;
+	public Date getCreatedOn() {
+		return createdOn;
 	}
 
-	public void setCreateOn(Date createOn) {
-		this.createOn = createOn;
+	public void setCreatedOn(Date createOn) {
+		createdOn = createOn;
 	}
 
 	public Date getUpdatedOn() {
