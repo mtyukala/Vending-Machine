@@ -32,20 +32,17 @@ public class Product extends AuditModel implements Comparable<Product> {
     private String pictureURL;
 
     public Product() {
-
         name = "";
         price = 0;
         weight = 0;
         items = 0;
         pictureURL = "";
-        //  logger.info("Create empty product");
     }
 
-    public Product(Long id,
+    public Product(
                    @NotNull(message = "Please, enter a description of the product") @Size(min = 5, max = 50, message = "Description must be between {min} and {max} characters") String name,
                    @Min(message = "Price cannot be negative", value = 0) float price, float weight, int items, String pictureURL) {
         super();
-        this.id = id;
         this.name = name;
         this.price = price;
         this.weight = weight;

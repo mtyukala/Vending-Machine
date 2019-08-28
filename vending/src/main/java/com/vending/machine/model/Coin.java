@@ -1,11 +1,13 @@
 package com.vending.machine.model;
 
+import com.vending.machine.utils.Utils;
+
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Table(name = "coin")
+@Table(name = "coin", uniqueConstraints = {@UniqueConstraint(columnNames = {"amount", "description"})})
 @Entity
 public class Coin extends AuditModel implements Comparable<Coin> {
 	/**
@@ -25,8 +27,8 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 	private String description;
 
 	public Coin() {
-        amount = 0;
-        description = "";
+		amount = 0;
+		description = "";
 	}
 
 	public Coin(@Min(message = "Value cannot be negative", value = 0) double amount,
@@ -42,7 +44,7 @@ public class Coin extends AuditModel implements Comparable<Coin> {
     }
 
     public void setCid(Long prodID) {
-        cid = prodID;
+		cid = prodID;
 	}
 
 	public double getAmount() {
@@ -63,7 +65,7 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 
 	@Override
 	public String toString() {
-		return description + amount / 100;
+		return "[" + description + "= R" + amount / Utils.OneUnit + "]";
 	}
 
 	public int getCount() {
@@ -87,8 +89,8 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 			return false;
 		}
 		Coin coin = (Coin) obj;
-		return (coin.getAmount() == getAmount()
-				&& coin.getDescription().equals(getDescription())
+		return (//coin.getAmount() == getAmount()
+				coin.getDescription().equals(getDescription())
 				&& coin.getCount() == getCount());
 
 		// return true;
@@ -99,9 +101,9 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 		int prime = 43;
 		int result = 1;
 
-        result = prime * result + (getCid().hashCode());
-		result = prime * result + Long.valueOf(Double.doubleToLongBits(getAmount())).hashCode();
-		result = prime * result + getDescription().hashCode();
+		result = (prime * result) + (getCid().hashCode());
+		result = (prime * result) + Long.valueOf(Double.doubleToLongBits(getAmount())).hashCode();
+		result = (prime * result) + getDescription().hashCode();
 
 		return result;
 	}
@@ -117,13 +119,10 @@ public class Coin extends AuditModel implements Comparable<Coin> {
 		}
 
 		if (amount < coin.getAmount()) {
-			return BEFORE;
-		}
-		if (amount > coin.getAmount()) {
 			return AFTER;
 		}
 
-		return EQUAL;
+		return BEFORE; // --- sorting by descending order
 
 	}
 }

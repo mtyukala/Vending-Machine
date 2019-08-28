@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "purchase")
@@ -88,14 +89,10 @@ public class Purchase extends AuditModel implements Comparable<Purchase> {
         Purchase other = (Purchase) obj;
         if (amount == null) {
             return false;
-        } else if (!product.equals(other.getProduct())) {
-            return false;
-        } else if (!amount.equals(other.getAmount())) {
-            return false;
-        } else if (quantity != other.getQuantity()) {
-            return false;
         }
-        return true;
+        return Objects.equals(product, other.getProduct()) &&
+                Objects.equals(amount, other.getAmount()) &&
+                Objects.equals(quantity, other.getQuantity());
     }
 
     @Override
@@ -124,6 +121,11 @@ public class Purchase extends AuditModel implements Comparable<Purchase> {
 
         return EQUAL;
 
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, pid, product, quantity);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.vending.machine;
+package com.vending.machine.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,5 +17,6 @@ public class ApplicationConfig implements WebMvcConfigurer {
         // Can just allow `methods` that you need.
         registry.addMapping("/**").allowedMethods("PUT", "GET", "DELETE", "OPTIONS", "PATCH", "POST");
     }
+
 
 }
