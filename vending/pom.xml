@@ -21,7 +21,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
         <hibernate.version>5.4.4.Final</hibernate.version>
-        <hibernate-core.version>5.4.4.Final</hibernate-core.version>
+        <hibernate-core.version>5.4.24.Final</hibernate-core.version>
     </properties>
 
     <dependencies>
